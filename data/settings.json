@@ -1,0 +1,10 @@
+{
+  "telegramChatId": "8762213445",
+  "autoApproveUnder": 0,
+  "apps": {
+    "LawnGenius": true,
+    "PoolIQ": true,
+    "ScoutGenius": true,
+    "DroneSpray": true
+  }
+}
