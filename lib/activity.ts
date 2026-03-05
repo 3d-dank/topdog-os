@@ -25,10 +25,7 @@ export function readActivity(): ActivityEntry[] {
 
 export function addActivity(item: Omit<ActivityEntry, 'id'>): ActivityEntry {
   const items = readActivity()
-  const newItem: ActivityEntry = {
-    ...item,
-    id: `act_${Date.now()}`,
-  }
+  const newItem: ActivityEntry = { ...item, id: 'act_' + Date.now() }
   items.unshift(newItem)
   fs.writeFileSync(DATA_PATH, JSON.stringify(items, null, 2))
   return newItem

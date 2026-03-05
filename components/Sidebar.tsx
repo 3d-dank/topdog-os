@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const navItems = [
   {
@@ -79,11 +79,33 @@ const navItems = [
       </svg>
     ),
   },
+  {
+    href: '/costs',
+    label: 'Costs',
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="7.5" cy="7.5" r="6" stroke="currentColor" strokeWidth="1.2"/>
+        <path d="M7.5 3.5v8M5.5 5.5c0-.828.895-1.5 2-1.5s2 .672 2 1.5S8.605 7 7.5 7s-2 .672-2 1.5.895 1.5 2 1.5 2-.672 2-1.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
 ]
 
 export default function Sidebar() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [costAlert, setCostAlert] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/costs')
+      .then((r) => r.json())
+      .then((data: { summary?: { today?: number }; thresholds?: { dailyWarning?: number } }) => {
+        const today = data?.summary?.today ?? 0
+        const warn = data?.thresholds?.dailyWarning ?? 15
+        setCostAlert(today >= warn)
+      })
+      .catch(() => {/* ignore */})
+  }, [])
 
   return (
     <>
@@ -169,6 +191,19 @@ export default function Sidebar() {
               >
                 <span style={{ opacity: isActive ? 1 : 0.6 }}>{item.icon}</span>
                 <span>{item.label}</span>
+                {item.href === '/costs' && costAlert && (
+                  <span
+                    style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      backgroundColor: '#EF4444',
+                      boxShadow: '0 0 4px #EF4444',
+                      marginLeft: 'auto',
+                      flexShrink: 0,
+                    }}
+                  />
+                )}
               </Link>
             )
           })}

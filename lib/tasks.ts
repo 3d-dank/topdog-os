@@ -33,11 +33,7 @@ export function writeTasks(items: Task[]): void {
 
 export function addTask(item: Omit<Task, 'id' | 'createdAt'>): Task {
   const items = readTasks()
-  const newItem: Task = {
-    ...item,
-    id: `task_${Date.now()}`,
-    createdAt: new Date().toISOString(),
-  }
+  const newItem: Task = { ...item, id: 'task_' + Date.now(), createdAt: new Date().toISOString() }
   items.push(newItem)
   writeTasks(items)
   return newItem

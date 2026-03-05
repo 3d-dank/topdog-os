@@ -1,10 +1,58 @@
 [
-  { "id": "1", "ts": "2026-03-05T19:45:00Z", "text": "SpaGenius Infinity Edge redesign complete", "type": "build", "appId": "spagenius" },
-  { "id": "2", "ts": "2026-03-05T19:30:00Z", "text": "Multi-affiliate product links added to all 4 Genius apps", "type": "feature", "appId": "all" },
-  { "id": "3", "ts": "2026-03-05T16:00:00Z", "text": "AquariumGenius app created and designed", "type": "launch", "appId": "aquariumgenius" },
-  { "id": "4", "ts": "2026-03-05T15:00:00Z", "text": "GardenGenius app created", "type": "launch", "appId": "gardengenius" },
-  { "id": "5", "ts": "2026-03-04T12:00:00Z", "text": "Migrated from Pi to DigitalOcean droplet", "type": "infra", "appId": "system" },
-  { "id": "6", "ts": "2026-03-04T10:00:00Z", "text": "Google Play Developer account created", "type": "milestone", "appId": "all" },
-  { "id": "7", "ts": "2026-03-03T08:00:00Z", "text": "LawnGenius Morning Dew redesign complete", "type": "build", "appId": "lawngenius" },
-  { "id": "8", "ts": "2026-03-02T14:00:00Z", "text": "ScoutGenius NDVI satellite module scoped", "type": "feature", "appId": "scoutgenius" }
+  {
+    "id": "1",
+    "ts": "2026-03-05T19:45:00Z",
+    "text": "SpaGenius Infinity Edge redesign complete",
+    "type": "build",
+    "appId": "spagenius"
+  },
+  {
+    "id": "2",
+    "ts": "2026-03-05T19:30:00Z",
+    "text": "Multi-affiliate product links added to all 4 Genius apps",
+    "type": "feature",
+    "appId": "all"
+  },
+  {
+    "id": "3",
+    "ts": "2026-03-05T16:00:00Z",
+    "text": "AquariumGenius app created and designed",
+    "type": "launch",
+    "appId": "aquariumgenius"
+  },
+  {
+    "id": "4",
+    "ts": "2026-03-05T15:00:00Z",
+    "text": "GardenGenius app created",
+    "type": "launch",
+    "appId": "gardengenius"
+  },
+  {
+    "id": "5",
+    "ts": "2026-03-04T12:00:00Z",
+    "text": "Migrated from Pi to DigitalOcean droplet",
+    "type": "infra",
+    "appId": "system"
+  },
+  {
+    "id": "6",
+    "ts": "2026-03-04T10:00:00Z",
+    "text": "Google Play Developer account created",
+    "type": "milestone",
+    "appId": "all"
+  },
+  {
+    "id": "7",
+    "ts": "2026-03-03T08:00:00Z",
+    "text": "LawnGenius Morning Dew redesign complete",
+    "type": "build",
+    "appId": "lawngenius"
+  },
+  {
+    "id": "8",
+    "ts": "2026-03-02T14:00:00Z",
+    "text": "ScoutGenius NDVI satellite module scoped",
+    "type": "feature",
+    "appId": "scoutgenius"
+  }
 ]

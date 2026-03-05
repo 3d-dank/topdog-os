@@ -1,0 +1,43 @@
+{
+  "thresholds": {
+    "dailyWarning": 15,
+    "dailyCritical": 25,
+    "weeklyWarning": 60,
+    "weeklyCritical": 100,
+    "monthlyWarning": 200,
+    "monthlyCritical": 350
+  },
+  "entries": [
+    {
+      "id": "cost_20260303_001",
+      "ts": "2026-03-03T20:00:00.000Z",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-6",
+      "costUsd": 26.80,
+      "source": "manual",
+      "note": "Heavy sub-agent session"
+    },
+    {
+      "id": "cost_20260304_001",
+      "ts": "2026-03-04T20:00:00.000Z",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-6",
+      "costUsd": 12.00,
+      "source": "estimated",
+      "note": "Migration day"
+    },
+    {
+      "id": "cost_20260305_001",
+      "ts": "2026-03-05T20:00:00.000Z",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-6",
+      "costUsd": 10.00,
+      "source": "estimated",
+      "note": "Current session estimate — update with real data"
+    }
+  ],
+  "lastChecked": null,
+  "totalThisMonth": 0,
+  "totalThisWeek": 0,
+  "totalToday": 0
+}

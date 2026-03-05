@@ -11,17 +11,10 @@ async function logActivity(entry: {
 }) {
   try {
     const { addActivity } = await import('@/lib/activity')
-    const validTypes = ['build','feature','launch','infra','milestone','signup','payment','alert','support'] as const
-    type AT = typeof validTypes[number]
-    const safeType: AT = (validTypes as readonly string[]).includes(entry.type)
-      ? (entry.type as AT)
-      : 'alert'
-    addActivity({
-      type: safeType,
-      text: entry.text,
-      appId: 'system',
-      ts: new Date().toISOString(),
-    })
+    type AT = 'build'|'feature'|'launch'|'infra'|'milestone'|'signup'|'payment'|'alert'|'support'
+    const valid: string[] = ['build','feature','launch','infra','milestone','signup','payment','alert','support']
+    const safeType: AT = valid.includes(entry.type) ? (entry.type as AT) : 'alert'
+    addActivity({ type: safeType, text: entry.text, appId: 'system', ts: new Date().toISOString() })
   } catch (err) {
     console.warn('[Stripe Webhook] Could not log activity:', err)
   }
