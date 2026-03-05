@@ -1,31 +1,141 @@
 'use client'
 
 import { useState } from 'react'
-import type { ApprovalItem, ApprovalStatus } from '@/lib/approvals'
+import type { ApprovalItem } from '@/lib/approvals'
 
-const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
-  Refund: { bg: '#3B82F620', text: '#60A5FA' },
-  'Support Escalation': { bg: '#F59E0B20', text: '#FCD34D' },
-  'Review Response': { bg: '#8B5CF620', text: '#A78BFA' },
-  Alert: { bg: '#EF444420', text: '#F87171' },
-}
-
-const APP_COLORS: Record<string, string> = {
-  LawnGenius: '#4CAF50',
-  PoolIQ: '#3B82F6',
-  ScoutGenius: '#8B5CF6',
-  'Drone Spray': '#F59E0B',
-}
-
-function formatTime(ts: string) {
+function formatAge(ts: string) {
   const d = new Date(ts)
   const now = new Date()
   const diff = now.getTime() - d.getTime()
   const mins = Math.floor(diff / 60000)
-  if (mins < 60) return `${mins}m ago`
+  if (mins < 60) return `${mins}m`
   const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  if (hrs < 24) return `${hrs}h`
+  const days = Math.floor(hrs / 24)
+  return `${days}d`
+}
+
+function TypeBadge({ type }: { type: string }) {
+  const lc = type.toLowerCase()
+  let bg = '#1E1E2E'
+  let color = '#64748B'
+  let border = '#1E1E2E'
+  let label = type
+
+  if (lc.includes('refund')) {
+    bg = 'rgba(239,68,68,0.08)'
+    color = '#EF4444'
+    border = 'rgba(239,68,68,0.3)'
+    label = 'REFUND'
+  } else if (lc.includes('escalation')) {
+    bg = 'rgba(245,158,11,0.08)'
+    color = '#F59E0B'
+    border = 'rgba(245,158,11,0.3)'
+    label = 'ESCALATION'
+  } else if (lc.includes('dispute')) {
+    bg = 'rgba(239,68,68,0.06)'
+    color = '#EF4444'
+    border = 'rgba(239,68,68,0.4)'
+    label = 'DISPUTE'
+  } else if (lc.includes('review')) {
+    bg = 'rgba(99,102,241,0.08)'
+    color = '#6366F1'
+    border = 'rgba(99,102,241,0.3)'
+    label = 'REVIEW'
+  } else if (lc.includes('alert')) {
+    bg = 'rgba(239,68,68,0.08)'
+    color = '#EF4444'
+    border = 'rgba(239,68,68,0.3)'
+    label = 'ALERT'
+  }
+
+  return (
+    <span
+      className="mono text-xs font-semibold px-2 py-0.5"
+      style={{
+        backgroundColor: bg,
+        color,
+        border: `1px solid ${border}`,
+        borderRadius: '3px',
+        letterSpacing: '0.05em',
+      }}
+    >
+      {label}
+    </span>
+  )
+}
+
+function AppBadge({ name }: { name: string }) {
+  return (
+    <span
+      className="mono text-xs px-1.5 py-0.5"
+      style={{
+        color: '#94A3B8',
+        backgroundColor: '#13131F',
+        border: '1px solid #1E1E2E',
+        borderRadius: '3px',
+      }}
+    >
+      {name.toLowerCase().replace(' ', '-')}
+    </span>
+  )
+}
+
+function StatusBadge({ status }: { status: string }) {
+  let color = '#64748B'
+  if (status === 'approved') color = '#10B981'
+  if (status === 'denied') color = '#EF4444'
+  if (status === 'replied') color = '#6366F1'
+
+  return (
+    <span
+      className="mono text-xs font-semibold uppercase px-1.5 py-0.5"
+      style={{
+        color,
+        backgroundColor: `${color}12`,
+        border: `1px solid ${color}30`,
+        borderRadius: '3px',
+      }}
+    >
+      {status}
+    </span>
+  )
+}
+
+function ActionBtn({
+  label,
+  onClick,
+  disabled,
+  variant = 'default',
+}: {
+  label: string
+  onClick: () => void
+  disabled?: boolean
+  variant?: 'approve' | 'deny' | 'default'
+}) {
+  const colors = {
+    approve: { color: '#10B981', border: 'rgba(16,185,129,0.3)', bg: 'rgba(16,185,129,0.06)' },
+    deny: { color: '#EF4444', border: 'rgba(239,68,68,0.3)', bg: 'rgba(239,68,68,0.06)' },
+    default: { color: '#64748B', border: '#1E1E2E', bg: 'transparent' },
+  }
+  const c = colors[variant]
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="mono text-xs px-2.5 py-1 transition-opacity hover:opacity-80 disabled:opacity-30"
+      style={{
+        color: c.color,
+        backgroundColor: c.bg,
+        border: `1px solid ${c.border}`,
+        borderRadius: '3px',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+      }}
+    >
+      {label}
+    </button>
+  )
 }
 
 export default function ApprovalsClient({ initialItems }: { initialItems: ApprovalItem[] }) {
@@ -43,7 +153,6 @@ export default function ApprovalsClient({ initialItems }: { initialItems: Approv
       setReplyId(id)
       return
     }
-
     setLoading(id + action)
     try {
       const res = await fetch(`/api/approvals/${id}/action`, {
@@ -69,221 +178,207 @@ export default function ApprovalsClient({ initialItems }: { initialItems: Approv
   const displayItems = tab === 'pending' ? pending : resolved
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Approval Queue</h1>
-          <p style={{ color: '#94A3B8' }} className="text-sm mt-1">
-            Items that need your decision before action is taken
-          </p>
+    <div className="max-w-5xl mx-auto space-y-5">
+      {/* Page header */}
+      <div
+        className="flex items-center justify-between"
+        style={{ borderBottom: '1px solid #1E1E2E', paddingBottom: '12px' }}
+      >
+        <div className="flex items-baseline gap-3">
+          <h1 className="text-base font-semibold" style={{ color: '#E2E8F0' }}>Approval Queue</h1>
+          <span className="label">/ items requiring action</span>
         </div>
         {pending.length > 0 && (
           <span
-            className="px-3 py-1 rounded-full text-sm font-bold text-white"
-            style={{ backgroundColor: '#EF4444' }}
+            className="mono text-xs font-semibold px-2.5 py-1"
+            style={{
+              color: '#EF4444',
+              backgroundColor: 'rgba(239,68,68,0.08)',
+              border: '1px solid rgba(239,68,68,0.25)',
+              borderRadius: '3px',
+            }}
           >
-            {pending.length} pending
+            {pending.length} PENDING
           </span>
         )}
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 rounded-lg w-fit" style={{ backgroundColor: '#1E293B' }}>
+      <div className="flex items-center gap-1" style={{ borderBottom: '1px solid #1E1E2E' }}>
         {(['pending', 'resolved'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className="px-4 py-1.5 rounded-md text-sm font-medium capitalize transition-all"
+            className="mono text-xs font-semibold px-3 py-2 capitalize transition-colors relative"
             style={{
-              backgroundColor: tab === t ? '#4CAF50' : 'transparent',
-              color: tab === t ? 'white' : '#94A3B8',
+              color: tab === t ? '#00D4AA' : '#64748B',
+              borderBottom: tab === t ? '2px solid #00D4AA' : '2px solid transparent',
+              marginBottom: '-1px',
+              backgroundColor: 'transparent',
             }}
           >
-            {t} {t === 'pending' ? `(${pending.length})` : `(${resolved.length})`}
+            {t.toUpperCase()} ({t === 'pending' ? pending.length : resolved.length})
           </button>
         ))}
       </div>
 
-      {/* Items */}
+      {/* Item list */}
       {displayItems.length === 0 ? (
         <div
-          className="rounded-xl p-12 text-center"
-          style={{ backgroundColor: '#1E293B', border: '1px solid #334155' }}
+          className="px-6 py-12 text-center"
+          style={{ border: '1px solid #1E1E2E', borderRadius: '6px', backgroundColor: '#0F0F1A' }}
         >
-          <div className="text-4xl mb-3">
-            {tab === 'pending' ? '🎉' : '📋'}
+          <div className="mono text-xs mb-2" style={{ color: '#334155' }}>
+            {tab === 'pending' ? '// no pending items' : '// no resolved items'}
           </div>
-          <div className="text-white font-medium">
-            {tab === 'pending' ? 'All clear! No pending items.' : 'No resolved items yet.'}
-          </div>
-          <div className="text-sm mt-1" style={{ color: '#64748B' }}>
-            {tab === 'pending' ? 'New items will appear here when they need your attention.' : 'Resolved approvals will show here.'}
+          <div className="text-sm" style={{ color: '#64748B' }}>
+            {tab === 'pending'
+              ? 'Queue is clear. New items appear here when flagged.'
+              : 'Resolved items will appear here.'}
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
-          {displayItems.map((item) => {
-            const typeColor = TYPE_COLORS[item.type] || { bg: '#33415520', text: '#94A3B8' }
-            const appColor = APP_COLORS[item.appName] || '#94A3B8'
+        <div
+          style={{ border: '1px solid #1E1E2E', borderRadius: '6px', backgroundColor: '#0F0F1A', overflow: 'hidden' }}
+        >
+          {/* Table header */}
+          <div
+            className="grid px-4 py-2"
+            style={{
+              gridTemplateColumns: '140px 1fr 120px 80px 80px 200px',
+              borderBottom: '1px solid #1E1E2E',
+              gap: '0 12px',
+            }}
+          >
+            {['TYPE', 'DESCRIPTION', 'APP', 'AMOUNT', 'AGE', 'ACTIONS'].map((h) => (
+              <span key={h} className="label">{h}</span>
+            ))}
+          </div>
 
+          {displayItems.map((item, idx) => {
+            const isResolved = item.status !== 'pending'
             return (
-              <div
-                key={item.id}
-                className="rounded-xl p-5"
-                style={{
-                  backgroundColor: '#1E293B',
-                  border: item.status === 'pending' ? '1px solid #334155' : '1px solid #2D3748',
-                  opacity: item.status !== 'pending' ? 0.75 : 1,
-                }}
-              >
-                {/* Top row */}
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {/* Type badge */}
-                    <span
-                      className="px-2.5 py-0.5 rounded-full text-xs font-semibold"
-                      style={{ backgroundColor: typeColor.bg, color: typeColor.text }}
-                    >
-                      {item.type}
-                    </span>
-                    {/* App badge */}
-                    <span
-                      className="px-2.5 py-0.5 rounded-full text-xs font-semibold"
-                      style={{ backgroundColor: `${appColor}20`, color: appColor }}
-                    >
-                      {item.appName}
-                    </span>
-                    {/* Status badge for resolved */}
-                    {item.status !== 'pending' && (
-                      <span
-                        className="px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize"
-                        style={{
-                          backgroundColor:
-                            item.status === 'approved'
-                              ? '#4CAF5020'
-                              : item.status === 'denied'
-                              ? '#EF444420'
-                              : '#8B5CF620',
-                          color:
-                            item.status === 'approved'
-                              ? '#4CAF50'
-                              : item.status === 'denied'
-                              ? '#F87171'
-                              : '#A78BFA',
-                        }}
-                      >
-                        {item.status}
-                      </span>
-                    )}
+              <div key={item.id}>
+                <div
+                  className="grid px-4 py-3 items-center transition-colors"
+                  style={{
+                    gridTemplateColumns: '140px 1fr 120px 80px 80px 200px',
+                    gap: '0 12px',
+                    borderBottom: idx < displayItems.length - 1 ? '1px solid #16162A' : undefined,
+                    backgroundColor: isResolved ? 'transparent' : 'transparent',
+                    opacity: isResolved ? 0.55 : 1,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.015)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                  }}
+                >
+                  {/* Type */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <TypeBadge type={item.type} />
+                    {isResolved && <StatusBadge status={item.status} />}
                   </div>
-                  <span className="text-xs shrink-0" style={{ color: '#64748B' }}>
-                    {formatTime(item.timestamp)}
-                  </span>
-                </div>
 
-                {/* User info */}
-                <div className="flex items-center gap-3 mb-3">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-                    style={{ backgroundColor: appColor + '40' }}
-                  >
-                    {item.userName.charAt(0)}
-                  </div>
-                  <div>
-                    <div className="text-white text-sm font-medium">{item.userName}</div>
-                    {item.userEmail && (
-                      <div className="text-xs" style={{ color: '#64748B' }}>{item.userEmail}</div>
-                    )}
-                  </div>
-                  {item.amount && (
+                  {/* Description + user */}
+                  <div className="min-w-0">
                     <div
-                      className="ml-auto text-lg font-bold"
-                      style={{ color: '#F59E0B' }}
+                      className="text-xs truncate"
+                      style={{
+                        color: isResolved ? '#334155' : '#94A3B8',
+                        textDecoration: isResolved ? 'line-through' : undefined,
+                      }}
                     >
-                      ${item.amount.toFixed(2)}
+                      {item.description}
                     </div>
-                  )}
+                    <div className="mono text-xs mt-0.5" style={{ color: '#334155' }}>
+                      {item.userName}
+                      {item.userEmail && ` · ${item.userEmail}`}
+                    </div>
+                  </div>
+
+                  {/* App */}
+                  <div><AppBadge name={item.appName} /></div>
+
+                  {/* Amount */}
+                  <div className="mono text-xs font-semibold" style={{ color: item.amount ? '#F59E0B' : '#334155' }}>
+                    {item.amount ? `$${item.amount.toFixed(2)}` : '—'}
+                  </div>
+
+                  {/* Age */}
+                  <div className="mono text-xs" style={{ color: '#334155' }}>
+                    {formatAge(item.timestamp)}
+                  </div>
+
+                  {/* Actions */}
+                  <div>
+                    {item.status === 'pending' ? (
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <ActionBtn
+                          label="[Approve]"
+                          onClick={() => handleAction(item.id, 'approve')}
+                          disabled={loading === item.id + 'approve'}
+                          variant="approve"
+                        />
+                        <ActionBtn
+                          label="[Deny]"
+                          onClick={() => handleAction(item.id, 'deny')}
+                          disabled={loading === item.id + 'deny'}
+                          variant="deny"
+                        />
+                        <ActionBtn
+                          label={replyId === item.id ? '[Send]' : '[Reply]'}
+                          onClick={() =>
+                            replyId === item.id
+                              ? handleAction(item.id, 'reply')
+                              : setReplyId(item.id)
+                          }
+                          disabled={loading === item.id + 'reply'}
+                        />
+                        {replyId === item.id && (
+                          <button
+                            onClick={() => { setReplyId(null); setReplyText('') }}
+                            className="mono text-xs"
+                            style={{ color: '#334155' }}
+                          >
+                            cancel
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      item.resolvedMessage && (
+                        <div
+                          className="text-xs italic truncate"
+                          style={{ color: '#334155' }}
+                          title={item.resolvedMessage}
+                        >
+                          &ldquo;{item.resolvedMessage}&rdquo;
+                        </div>
+                      )
+                    )}
+                  </div>
                 </div>
 
-                {/* Description */}
-                <p className="text-sm mb-4 leading-relaxed" style={{ color: '#CBD5E1' }}>
-                  {item.description}
-                </p>
-
-                {/* Reply box */}
+                {/* Reply textarea row */}
                 {replyId === item.id && (
-                  <div className="mb-4">
+                  <div
+                    className="px-4 pb-3"
+                    style={{ borderBottom: idx < displayItems.length - 1 ? '1px solid #16162A' : undefined }}
+                  >
                     <textarea
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
-                      placeholder="Type your reply..."
-                      rows={3}
-                      className="w-full rounded-lg px-3 py-2 text-sm text-white resize-none focus:outline-none focus:ring-2"
+                      placeholder="// type reply..."
+                      rows={2}
+                      className="mono w-full text-xs resize-none focus:outline-none px-3 py-2"
                       style={{
-                        backgroundColor: '#0F172A',
-                        border: '1px solid #334155',
-                        color: 'white',
-                        // @ts-expect-error CSS custom property
-                        '--tw-ring-color': '#4CAF50',
+                        backgroundColor: '#0A0A0F',
+                        border: '1px solid #1E1E2E',
+                        borderRadius: '4px',
+                        color: '#E2E8F0',
                       }}
                     />
-                  </div>
-                )}
-
-                {/* Resolved message */}
-                {item.resolvedMessage && (
-                  <div
-                    className="mb-4 px-3 py-2 rounded-lg text-sm italic"
-                    style={{ backgroundColor: '#0F172A', color: '#94A3B8' }}
-                  >
-                    &ldquo;{item.resolvedMessage}&rdquo;
-                  </div>
-                )}
-
-                {/* Action buttons */}
-                {item.status === 'pending' && (
-                  <div className="flex gap-2 flex-wrap">
-                    <button
-                      onClick={() => handleAction(item.id, 'approve')}
-                      disabled={loading === item.id + 'approve'}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                      style={{ backgroundColor: '#4CAF50' }}
-                    >
-                      ✅ Approve
-                    </button>
-                    <button
-                      onClick={() => handleAction(item.id, 'deny')}
-                      disabled={loading === item.id + 'deny'}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                      style={{ backgroundColor: '#EF4444' }}
-                    >
-                      ❌ Deny
-                    </button>
-                    <button
-                      onClick={() =>
-                        replyId === item.id
-                          ? handleAction(item.id, 'reply')
-                          : setReplyId(item.id)
-                      }
-                      disabled={loading === item.id + 'reply'}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-50"
-                      style={{
-                        backgroundColor: '#334155',
-                        color: '#CBD5E1',
-                      }}
-                    >
-                      {replyId === item.id ? '📤 Send Reply' : '💬 Reply'}
-                    </button>
-                    {replyId === item.id && (
-                      <button
-                        onClick={() => { setReplyId(null); setReplyText('') }}
-                        className="px-3 py-2 rounded-lg text-sm transition-opacity hover:opacity-90"
-                        style={{ color: '#64748B' }}
-                      >
-                        Cancel
-                      </button>
-                    )}
                   </div>
                 )}
               </div>
