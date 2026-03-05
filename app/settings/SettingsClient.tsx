@@ -2,21 +2,25 @@
 
 import { useState } from 'react'
 import type { Settings } from '@/lib/settings'
+import type { ApiKeyStatus } from './page'
 
 const APP_LIST: { key: keyof Settings['apps']; label: string }[] = [
   { key: 'LawnGenius', label: 'lawngenius' },
-  { key: 'PoolIQ', label: 'pooliq' },
+  { key: 'PoolIQ', label: 'spagenius / pooliq' },
   { key: 'ScoutGenius', label: 'scoutgenius' },
-  { key: 'DroneSpray', label: 'drone-spray' },
+  { key: 'DroneSpray', label: 'drone-spray (client)' },
 ]
 
-function ToggleSwitch({
-  checked,
-  onChange,
-}: {
-  checked: boolean
-  onChange: (v: boolean) => void
-}) {
+const APP_LINKS = [
+  { label: 'TopDog OS', url: 'https://topdog-os.vercel.app', emoji: '🏔' },
+  { label: 'GitHub Portfolio', url: 'https://github.com/3d-dank', emoji: '🐙' },
+  { label: 'MN Drone Spray (client)', url: 'https://drone-spray-site.vercel.app', emoji: '🚁' },
+  { label: 'Amazon Associates', url: 'https://affiliate-program.amazon.com', emoji: '📦' },
+  { label: 'Expo EAS', url: 'https://expo.dev', emoji: '⚡' },
+  { label: 'DigitalOcean', url: 'https://cloud.digitalocean.com', emoji: '💧' },
+]
+
+function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <button
       onClick={() => onChange(!checked)}
@@ -56,24 +60,13 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function InputField({
-  label,
-  hint,
-  value,
-  onChange,
-  type = 'text',
+  label, hint, value, onChange, type = 'text',
 }: {
-  label: string
-  hint?: string
-  value: string | number
-  onChange: (v: string) => void
-  type?: string
+  label: string; hint?: string; value: string | number; onChange: (v: string) => void; type?: string
 }) {
   return (
     <div>
-      <label
-        className="block mono text-xs font-medium mb-1.5"
-        style={{ color: '#94A3B8' }}
-      >
+      <label className="block mono text-xs font-medium mb-1.5" style={{ color: '#94A3B8' }}>
         {label}
       </label>
       <input
@@ -91,14 +84,18 @@ function InputField({
         onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(0,212,170,0.4)' }}
         onBlur={(e) => { e.currentTarget.style.borderColor = '#1E1E2E' }}
       />
-      {hint && (
-        <p className="mono text-xs mt-1.5" style={{ color: '#334155' }}>{hint}</p>
-      )}
+      {hint && <p className="mono text-xs mt-1.5" style={{ color: '#334155' }}>{hint}</p>}
     </div>
   )
 }
 
-export default function SettingsClient({ initialSettings }: { initialSettings: Settings }) {
+export default function SettingsClient({
+  initialSettings,
+  apiKeys,
+}: {
+  initialSettings: Settings
+  apiKeys: ApiKeyStatus[]
+}) {
   const [settings, setSettings] = useState<Settings>(initialSettings)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -120,6 +117,8 @@ export default function SettingsClient({ initialSettings }: { initialSettings: S
     }
   }
 
+  const configuredCount = apiKeys.filter((k) => k.status === 'configured').length
+
   return (
     <div className="max-w-2xl mx-auto space-y-5">
       {/* Page header */}
@@ -129,6 +128,70 @@ export default function SettingsClient({ initialSettings }: { initialSettings: S
           <span className="label">/ system configuration</span>
         </div>
       </div>
+
+      {/* API Key Status */}
+      <Section title="API KEYS">
+        <div className="space-y-0">
+          {apiKeys.map((k, i) => {
+            const isOk = k.status === 'configured'
+            return (
+              <div
+                key={k.key}
+                className="flex items-center justify-between py-2.5"
+                style={{ borderBottom: i < apiKeys.length - 1 ? '1px solid #16162A' : undefined }}
+              >
+                <div>
+                  <div className="mono text-xs font-medium" style={{ color: '#94A3B8' }}>{k.key}</div>
+                  <div className="mono text-xs mt-0.5" style={{ color: '#334155' }}>{k.label}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{
+                      backgroundColor: isOk ? '#10B981' : '#EF4444',
+                      boxShadow: `0 0 4px ${isOk ? '#10B981' : '#EF4444'}`,
+                    }}
+                  />
+                  <span
+                    className="mono text-xs"
+                    style={{ color: isOk ? '#10B981' : '#EF4444' }}
+                  >
+                    {isOk ? 'Configured ✓' : 'Missing ✗'}
+                  </span>
+                </div>
+              </div>
+            )
+          })}
+          <div className="pt-3">
+            <span className="mono text-xs" style={{ color: '#334155' }}>
+              {configuredCount}/{apiKeys.length} keys configured · Set in .env.local on server
+            </span>
+          </div>
+        </div>
+      </Section>
+
+      {/* App Links */}
+      <Section title="APP LINKS">
+        <div className="grid grid-cols-1 gap-2">
+          {APP_LINKS.map((link) => (
+            <div key={link.url} className="flex items-center justify-between py-1.5">
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize: '0.85rem' }}>{link.emoji}</span>
+                <span className="mono text-xs" style={{ color: '#94A3B8' }}>{link.label}</span>
+              </div>
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mono text-xs hover:underline"
+                style={{ color: '#334155' }}
+              >
+                {link.url.replace('https://', '')} ↗
+              </a>
+            </div>
+          ))}
+        </div>
+      </Section>
 
       {/* Telegram */}
       <Section title="NOTIFICATIONS / TELEGRAM">
@@ -147,9 +210,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: S
           hint="// set 0 to require all approvals · e.g. 10 to auto-approve refunds < $10"
           value={settings.autoApproveUnder}
           type="number"
-          onChange={(v) =>
-            setSettings({ ...settings, autoApproveUnder: parseFloat(v) || 0 })
-          }
+          onChange={(v) => setSettings({ ...settings, autoApproveUnder: parseFloat(v) || 0 })}
         />
       </Section>
 
@@ -160,25 +221,16 @@ export default function SettingsClient({ initialSettings }: { initialSettings: S
             <div
               key={key}
               className="flex items-center justify-between py-2.5"
-              style={{
-                borderBottom: i < APP_LIST.length - 1 ? '1px solid #16162A' : undefined,
-              }}
+              style={{ borderBottom: i < APP_LIST.length - 1 ? '1px solid #16162A' : undefined }}
             >
-              <span className="mono text-xs font-medium" style={{ color: '#94A3B8' }}>
-                {label}
-              </span>
+              <span className="mono text-xs font-medium" style={{ color: '#94A3B8' }}>{label}</span>
               <div className="flex items-center gap-2">
                 <span className="mono text-xs" style={{ color: settings.apps[key] ? '#00D4AA' : '#334155' }}>
                   {settings.apps[key] ? 'enabled' : 'disabled'}
                 </span>
                 <ToggleSwitch
                   checked={settings.apps[key]}
-                  onChange={(v) =>
-                    setSettings({
-                      ...settings,
-                      apps: { ...settings.apps, [key]: v },
-                    })
-                  }
+                  onChange={(v) => setSettings({ ...settings, apps: { ...settings.apps, [key]: v } })}
                 />
               </div>
             </div>
@@ -202,9 +254,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: S
           {saving ? '// saving...' : '[ SAVE SETTINGS ]'}
         </button>
         {saved && (
-          <span className="mono text-xs" style={{ color: '#10B981' }}>
-            ✓ saved
-          </span>
+          <span className="mono text-xs" style={{ color: '#10B981' }}>✓ saved</span>
         )}
       </div>
     </div>

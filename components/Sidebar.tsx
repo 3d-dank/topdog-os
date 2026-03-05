@@ -18,6 +18,17 @@ const navItems = [
     ),
   },
   {
+    href: '/projects',
+    label: 'Projects',
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="3" height="13" rx="0.5" stroke="currentColor" strokeWidth="1.2"/>
+        <rect x="6" y="4" width="3" height="10" rx="0.5" stroke="currentColor" strokeWidth="1.2"/>
+        <rect x="11" y="7" width="3" height="7" rx="0.5" stroke="currentColor" strokeWidth="1.2"/>
+      </svg>
+    ),
+  },
+  {
     href: '/approvals',
     label: 'Approval Queue',
     icon: (

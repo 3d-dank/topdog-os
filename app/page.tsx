@@ -1,11 +1,16 @@
 import { readApprovals } from '@/lib/approvals'
+import RecentCommits from '@/components/live/RecentCommits'
+import BuildStatusBadge from '@/components/live/BuildStatusBadge'
 
 const apps = [
-  { id: 'lawngenius', name: 'lawngenius', status: 'operational', build: '#2', platform: 'ios+android' },
-  { id: 'pooliq', name: 'pooliq', status: 'operational', build: '#1', platform: 'ios+android' },
-  { id: 'scoutgenius', name: 'scoutgenius', status: 'operational', build: '—', platform: 'pending build' },
-  { id: 'drone-spray', name: 'drone-spray', status: 'operational', build: 'vercel', platform: 'web' },
+  { id: 'lawngenius', name: 'lawngenius', status: 'operational', platform: 'ios+android' },
+  { id: 'spagenius', name: 'spagenius', status: 'operational', platform: 'ios+android' },
+  { id: 'scoutgenius', name: 'scoutgenius', status: 'operational', platform: 'pending build' },
+  { id: 'drone-spray', name: 'drone-spray', status: 'operational', platform: 'web' },
 ]
+
+// EAS apps (have Expo builds)
+const EAS_APP_IDS = ['lawngenius', 'spagenius']
 
 const activity = [
   { ts: '03:14:22', text: 'New signup — lawngenius', type: 'signup' },
@@ -49,7 +54,7 @@ export default function OverviewPage() {
 
       {/* Stat rows + Activity feed — 70/30 split */}
       <div className="flex gap-5" style={{ alignItems: 'flex-start' }}>
-        {/* Left: Stats + App Status */}
+        {/* Left: Stats + App Status + Commits */}
         <div className="flex-1 min-w-0 space-y-5">
 
           {/* Compact stat rows */}
@@ -114,9 +119,22 @@ export default function OverviewPage() {
                       </span>
                     </td>
                     <td className="px-4 py-2.5">
-                      <span className="mono text-xs" style={{ color: '#64748B' }}>
-                        build {app.build}
-                      </span>
+                      {/* Build status badge — live from EAS for Expo apps */}
+                      {EAS_APP_IDS.includes(app.id) ? (
+                        <BuildStatusBadge appId={app.id} />
+                      ) : (
+                        <span
+                          className="mono text-xs px-1.5 py-0.5"
+                          style={{
+                            color: '#64748B',
+                            backgroundColor: '#13131F',
+                            border: '1px solid #1E1E2E',
+                            borderRadius: '3px',
+                          }}
+                        >
+                          — No builds
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-2.5">
                       <span
@@ -136,6 +154,9 @@ export default function OverviewPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Recent Commits — live from GitHub */}
+          <RecentCommits />
         </div>
 
         {/* Right: Activity feed — 30% */}

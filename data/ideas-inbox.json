@@ -1,0 +1,57 @@
+[
+  {
+    "id": "1",
+    "name": "ChickenGenius",
+    "tagline": "Point your phone at your flock. Know what's wrong before you lose a bird.",
+    "score": 43,
+    "status": "pitched",
+    "submittedAt": "2026-03-05T20:00:00Z",
+    "market": "13M US households keeping backyard chickens. Avg spend $500–1,500/yr on feed, supplements, coops. Accelerated by egg price surges and urban homesteading trend.",
+    "affiliateEstimate": "$650–900/mo at 1k users",
+    "verdict": "Largest underserved market on the list. 13M chicken-keeping households and not one AI photo health diagnosis app exists. The Genius formula maps perfectly: photo of bird → health score → buy the supplement. Repeat-purchase consumables (feed, treatments) make affiliate revenue evergreen."
+  },
+  {
+    "id": "2",
+    "name": "HVACGenius",
+    "tagline": "Snap your air filter. Know if your HVAC is killing your air quality.",
+    "score": 42,
+    "status": "pitched",
+    "submittedAt": "2026-03-05T20:00:00Z",
+    "market": "100M+ US homes with HVAC. 70M+ homeowner-occupied. Air filter market $3B/yr. Every homeowner has a filter they change inconsistently.",
+    "affiliateEstimate": "$800–1,200/mo at 1k users",
+    "verdict": "Largest TAM on the list. Air filters are a $15–50 recurring purchase every 1–3 months — affiliate revenue is practically automatic. Existing HVAC apps all target professional technicians, leaving the homeowner market completely open. The 'snap your dirty filter' hook is visually obvious and shareable."
+  },
+  {
+    "id": "3",
+    "name": "CigarGenius",
+    "tagline": "Your humidor, diagnosed. Your sticks, protected.",
+    "score": 39,
+    "status": "pitched",
+    "submittedAt": "2026-03-05T20:00:00Z",
+    "market": "13M US premium cigar smokers. High-income demographic spending $1,500–5,000/yr. US luxury cigar market $15B in 2024, growing 7.5% CAGR.",
+    "affiliateEstimate": "$700–1,100/mo at 1k users",
+    "verdict": "Small but affluent market with sky-high purchase intent. Boveda packs, hygrometers, and humidors are recurring/upgrade purchases. Existing apps require proprietary hardware — a photo-first AI approach wins on accessibility. High willingness to pay for premium tools in this demographic."
+  },
+  {
+    "id": "4",
+    "name": "KoiGenius",
+    "tagline": "Your pond, scored. Your koi, thriving.",
+    "score": 39,
+    "status": "pitched",
+    "submittedAt": "2026-03-05T20:00:00Z",
+    "market": "1.5–2M US koi pond owners. Global koi market $1.2–3B, growing 9–12% CAGR. Among the highest-spending hobbyists — single fish can cost $500–50,000.",
+    "affiliateEstimate": "$750–1,100/mo at 1k users",
+    "verdict": "Direct extension of existing SpaGenius/AquariumGenius architecture — test strip scan + water chemistry score + fish health photo. KoiControl has some traction but zero AI photo scoring. Build speed advantage is significant given Jeff already has the water chemistry scan pipeline built."
+  },
+  {
+    "id": "5",
+    "name": "ReptileGenius",
+    "tagline": "Your bearded dragon deserves a health score.",
+    "score": 38,
+    "status": "pitched",
+    "submittedAt": "2026-03-05T20:00:00Z",
+    "market": "7M US reptile-owning households. US reptile industry ~$1.5B. High-spend on UVB lighting, heating, enclosures. Bearded dragons, ball pythons, and leopard geckos are dominant species.",
+    "affiliateEstimate": "$550–800/mo at 1k users",
+    "verdict": "Reptile keepers are massively underserved by tech. Existing apps only do species identification — none offer habitat health scoring or AI photo diagnosis. UVB bulb replacement reminders alone drive recurring affiliate revenue. Strong AI angle with genuinely life-saving potential (MBD, respiratory infections caught early)."
+  }
+]

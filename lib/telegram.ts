@@ -1,3 +1,8 @@
+// Alias used by Phase 2 integrations
+export async function sendTelegramAlert(message: string): Promise<boolean> {
+  return sendTelegram(message)
+}
+
 export async function sendTelegram(message: string, chatId?: string): Promise<boolean> {
   const token = process.env.TELEGRAM_BOT_TOKEN
   const targetChatId = chatId || '8762213445'
